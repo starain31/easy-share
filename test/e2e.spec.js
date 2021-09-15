@@ -23,7 +23,7 @@ describe('POST /files', () => {
     it('should . It should accept “multipart/form-data”', function () {
         return request(app)
             .post('/files')
-            .attach('file.txt', './test/test_files/test_file_1.txt')
+            .attach('file', './test/test_files/test_file_1.txt')
             .set("Content-Type", "multipart/form-data")
             .expect(200);
     });
@@ -31,7 +31,7 @@ describe('POST /files', () => {
     it('should upload file to folder specified in environment variable', function (done ) {
         request(app)
             .post('/files')
-            .attach('file.txt', './test/test_files/test_file_1.txt')
+            .attach('file', './test/test_files/test_file_1.txt')
             .set("Content-Type", "multipart/form-data")
             .then(function () {
                 expect(fs.existsSync(`${process.env.FOLDER}/test_file_1.txt`)).toBeTruthy();

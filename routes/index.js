@@ -9,7 +9,7 @@ router.get('/', function(req, res) {
   res.render('index', { title: 'Express' });
 });
 
-router.post('/files', upload.single('file.txt'), function (req, res) {
+router.post('/files', upload.single('file'), function (req, res) {
   res.status(200).send();
 });
 
