@@ -40,4 +40,19 @@ describe('POST /files', () => {
                 done();
             });
     });
+
+    it('should upload the file', function (done) {
+        request(app)
+            .post('/files')
+            .attach('file', './test/test_files/test_file_1.txt')
+            .set("Content-Type", "multipart/form-data")
+            .then(function (response) {
+                request(app)
+                    .get(`/files/${response.body.publicKey}`)
+                    .expect(200)
+                    .then(function () {
+                        done();
+                    })
+            });
+    });
 })
