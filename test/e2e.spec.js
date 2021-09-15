@@ -22,7 +22,6 @@ describe('POST /files', () => {
     it('should . It should accept “multipart/form-data”', function () {
         return request(app)
             .post('/files')
-            .field('name', 'my awesome avatar')
             .attach('file.txt', './test/test_files/test_file_1.txt')
             .set("Content-Type", "multipart/form-data")
             .expect(200);
