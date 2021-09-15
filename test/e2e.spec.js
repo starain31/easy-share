@@ -1,6 +1,5 @@
 const request = require("supertest");
 const app = require("../app");
-const fs = require("fs");
 
 describe("Test the root path", () => {
     test("It should response the root path", done => {
@@ -17,6 +16,8 @@ describe('POST /files', () => {
     it('should be defined', function () {
         return request(app)
             .post('/files')
+            .attach('file', './test/test_files/test_file_1.txt')
+            .set("Content-Type", "multipart/form-data")
             .expect(200);
     });
 
@@ -28,18 +29,15 @@ describe('POST /files', () => {
             .expect(200);
     });
 
-    it('should upload file to folder specified in environment variable', function (done ) {
+    it('should return a “publicKey” and a “privateKey”', function (done ) {
         request(app)
             .post('/files')
             .attach('file', './test/test_files/test_file_1.txt')
             .set("Content-Type", "multipart/form-data")
-            .then(function () {
-                expect(fs.existsSync(`${process.env.FOLDER}/test_file_1.txt`)).toBeTruthy();
+            .then(function (response) {
+                expect(response.body.publicKey).toBeDefined();
+                expect(response.body.privateKey).toBeDefined();
                 done();
-            })
-            .catch(function (err) {
-                done(err);
-            })
-
+            });
     });
 })
