@@ -11,3 +11,11 @@ describe("Test the root path", () => {
             });
     });
 });
+
+describe('POST /files', () => {
+    it('should be defined', function () {
+        return request(app)
+            .post('/files')
+            .expect(200);
+    });
+})
