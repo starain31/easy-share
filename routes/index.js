@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const multer  = require('multer')
-const upload = multer({ dest: 'uploads/' })
+const upload = multer({ dest: process.env.FOLDER })
 
 /* GET home page. */
 router.get('/', function(req, res) {
