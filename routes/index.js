@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const multer  = require('multer')
 const fs = require("fs");
+const db = require("../db");
+const { randomUUID } = require('crypto');
 
 const router = express.Router();
 const upload = multer( {storage: multer.memoryStorage() }).single('file');
@@ -11,16 +13,35 @@ router.get('/', function(req, res) {
 });
 
 router.post('/files', upload, async function (req, res) {
-  res.status(200).send({publicKey: "test", privateKey: "test"});
+  const publicKey = `public-${randomUUID()}`
+  const privateKey = `private-${randomUUID()}`
+
+  const file_path = path.join(process.env.FOLDER, `${publicKey}_${req.file.originalname}`);
+
+  await db.save_keys({
+    publicKey,
+    privateKey,
+    value:  {
+      ...req.file,
+      buffer: undefined,
+      path: file_path,
+      publicKey,
+      privateKey
+    }
+  });
+
+  fs.writeFileSync(file_path, req.file.buffer);
+
+  res.status(200).send({publicKey, privateKey});
 });
 
 router.get('/files/:publicKey?', async function (req, res) {
   try {
-    const img = path.join(process.env.FOLDER, req.params.publicKey);
+    const file = await db.get_value_by_key({key: req.params.publicKey});
 
-    const content =  fs.readFileSync(img);
+    const content =  fs.readFileSync(file.path);
 
-    res.writeHead(200, { "Content-type": "application/pdf" });
+    res.writeHead(200, { "Content-type": file.mimetype });
     res.end(content);
 
   } catch (e) {

@@ -1,5 +1,6 @@
 const request = require("supertest");
 const app = require("../app");
+const fs = require("fs");
 
 describe("Test the root path", () => {
     test("It should response the root path", done => {
@@ -41,16 +42,18 @@ describe('POST /files', () => {
             });
     });
 
-    it('should upload the file', function (done) {
+    it('should upload the file',function (done) {
+        const upload_file_path = './test/test_files/GrMyfpm.jpg';
         request(app)
             .post('/files')
-            .attach('file', './test/test_files/test_file_1.txt')
+            .attach('file', upload_file_path)
             .set("Content-Type", "multipart/form-data")
             .then(function (response) {
                 request(app)
                     .get(`/files/${response.body.publicKey}`)
                     .expect(200)
-                    .then(function () {
+                    .then(async function (response ) {
+                        expect(Buffer.compare(fs.readFileSync(upload_file_path), response.body)).toBe(0);
                         done();
                     })
             });
