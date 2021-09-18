@@ -6,6 +6,13 @@
 const app = require('../app');
 const debug = require('debug')('easy-share:server');
 const http = require('http');
+const fs = require("fs");
+
+const upload_folder_path = process.env.FOLDER || './uploads'
+
+if (!fs.existsSync(upload_folder_path)){
+  fs.mkdirSync(upload_folder_path);
+}
 
 /**
  * Get port from environment and store in Express.

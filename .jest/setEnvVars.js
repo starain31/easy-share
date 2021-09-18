@@ -1,1 +1,1 @@
-process.env.FOLDER = './uploads'
+process.env.FOLDER = './test/uploads'

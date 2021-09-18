@@ -17,7 +17,7 @@ describe('POST /files', () => {
     it('should be defined', function () {
         return request(app)
             .post('/files')
-            .attach('file', './test/test_files/test_file_1.txt')
+            .attach('file', './test/uploads/test_file_1.txt')
             .set("Content-Type", "multipart/form-data")
             .expect(200);
     });
@@ -25,7 +25,7 @@ describe('POST /files', () => {
     it('should . It should accept “multipart/form-data”', function () {
         return request(app)
             .post('/files')
-            .attach('file', './test/test_files/test_file_1.txt')
+            .attach('file', './test/uploads/test_file_1.txt')
             .set("Content-Type", "multipart/form-data")
             .expect(200);
     });
@@ -33,7 +33,7 @@ describe('POST /files', () => {
     it('should return a “publicKey” and a “privateKey”', function (done ) {
         request(app)
             .post('/files')
-            .attach('file', './test/test_files/test_file_1.txt')
+            .attach('file', './test/uploads/test_file_1.txt')
             .set("Content-Type", "multipart/form-data")
             .then(function (response) {
                 expect(response.body.publicKey).toBeDefined();
@@ -43,7 +43,7 @@ describe('POST /files', () => {
     });
 
     it('should upload the file',function (done) {
-        const upload_file_path = './test/test_files/GrMyfpm.jpg';
+        const upload_file_path = './test/uploads/GrMyfpm.jpg';
         request(app)
             .post('/files')
             .attach('file', upload_file_path)
