@@ -54,7 +54,7 @@ describe('API', () => {
         const uploaded_file = await request(app)
             .get(`/files/${publicKey}`)
             .expect(200)
-            .then(function (response ) {
+            .then(function (response) {
                 return response.body;
             });
 
@@ -73,6 +73,7 @@ describe('API', () => {
 
         await request(app)
             .delete(`/files/${privateKey}`)
-            .expect(200);
+            .expect(200)
+            .expect({message: 'file has been deleted.'});
     });
 })

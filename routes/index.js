@@ -50,7 +50,7 @@ router.get('/files/:publicKey?', async function (req, res) {
 });
 
 router.delete('/files/:privateKey', async function (req, res) {
-  res.sendStatus(200);
+  res.status(200).send({message: "file has been deleted."});
 });
 
 module.exports = router;
