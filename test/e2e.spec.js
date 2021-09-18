@@ -60,4 +60,19 @@ describe('API', () => {
 
         expect(Buffer.compare(fs.readFileSync(upload_file_path), uploaded_file)).toBe(0);
     });
+
+    it.only('should delete file', async function () {
+        const upload_file_path = './test/uploads/code-test.pdf';
+        const {privateKey} = await request(app)
+            .post('/files')
+            .attach('file', upload_file_path)
+            .set("Content-Type", "multipart/form-data")
+            .then(function (response) {
+                return response.body;
+            });
+
+        await request(app)
+            .delete(`/files/${privateKey}`)
+            .expect(200);
+    });
 })

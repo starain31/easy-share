@@ -47,6 +47,10 @@ router.get('/files/:publicKey?', async function (req, res) {
     console.error(e);
     res.status(404).send({message: "No such file or invalid key"});
   }
-})
+});
+
+router.delete('/files/:privateKey', async function (req, res) {
+  res.sendStatus(200);
+});
 
 module.exports = router;
