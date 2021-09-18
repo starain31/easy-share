@@ -3,7 +3,9 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
-const indexRouter = require('./routes/index');
+const db = require('./db');
+const create_router = require('./routes/index');
+const create_provider = require('./storage_provider');
 
 const app = express();
 
@@ -13,6 +15,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+const provider = create_provider({provider: process.env.PROVIDER, db});
+
+app.use('/', create_router({provider}));
 
 module.exports = app;
