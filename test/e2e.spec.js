@@ -22,7 +22,7 @@ describe('API', () => {
             .expect(200);
     });
 
-    it('should . It should accept “multipart/form-data”', function () {
+    it('It should accept “multipart/form-data”', function () {
         return request(app)
             .post('/files')
             .attach('file', './test/uploads/test_file_1.txt')
