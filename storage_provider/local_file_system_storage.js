@@ -29,7 +29,7 @@ function create({db}) {
     async function get({publicKey}) {
         const file_details = await db.get_value_by_key({key: publicKey});
 
-        if (file_details === undefined) {
+        if (!file_details) {
             throw "No such file";
         }
 
