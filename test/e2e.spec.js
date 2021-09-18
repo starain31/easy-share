@@ -13,7 +13,7 @@ describe("Test the root path", () => {
     });
 });
 
-describe('POST /files', () => {
+describe('API', () => {
     it('should be defined', function () {
         return request(app)
             .post('/files')
