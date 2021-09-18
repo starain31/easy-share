@@ -10,4 +10,10 @@ async function get_value_by_key({key}) {
     return files_details[key];
 }
 
-module.exports = {save_keys, get_value_by_key};
+async function delete_by_key({key}) {
+    const {publicKey, privatKey} = await get_value_by_key({key});
+    delete files_details[publicKey];
+    delete files_details[privatKey];
+}
+
+module.exports = {save_keys, get_value_by_key, delete_by_key};
