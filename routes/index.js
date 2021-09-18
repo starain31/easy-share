@@ -24,20 +24,16 @@ function create_router({provider}) {
     });
 
     router.get('/files/:publicKey?', async function (req, res) {
-        try {
-            const file = await db.get_value_by_key({key: req.params.publicKey});
-            if (file === undefined) {
-                throw "No such file";
-            }
+        provider.get({publicKey: req.params.publicKey})
+            .then(function ({content, file_details}) {
+                res.writeHead(200, {"Content-type": file_details.mimetype});
+                res.end(content);
+            })
+            .catch(function (e) {
+                console.error(e);
+                res.status(404).send({message: "No such file or invalid key"});
+            });
 
-            const content = fs.readFileSync(file.path);
-
-            res.writeHead(200, {"Content-type": file.mimetype});
-            res.end(content);
-        } catch (e) {
-            console.error(e);
-            res.status(404).send({message: "No such file or invalid key"});
-        }
     });
 
     router.delete('/files/:privateKey', async function (req, res) {

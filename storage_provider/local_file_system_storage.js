@@ -26,8 +26,21 @@ function create({db}) {
         return {publicKey, privateKey};
     }
 
+    async function get({publicKey}) {
+        const file_details = await db.get_value_by_key({key: publicKey});
+
+        if (file_details === undefined) {
+            throw "No such file";
+        }
+
+        const content = fs.readFileSync(file_details.path);
+
+        return {content, file_details}
+    }
+
     return {
-        post
+        post,
+        get
     };
 }
 
