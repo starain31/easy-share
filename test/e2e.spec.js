@@ -30,7 +30,7 @@ describe('POST /files', () => {
             .expect(200);
     });
 
-    it('should return a “publicKey” and a “privateKey”', function (done ) {
+    it('should return a “publicKey” and a “privateKey”', function (done) {
         request(app)
             .post('/files')
             .attach('file', './test/uploads/test_file_1.txt')
@@ -42,20 +42,22 @@ describe('POST /files', () => {
             });
     });
 
-    it('should upload the file',function (done) {
-        const upload_file_path = './test/uploads/GrMyfpm.jpg';
-        request(app)
+    it('should upload the file', async function () {
+        const upload_file_path = './test/uploads/code-test.pdf';
+        const {publicKey} = await request(app)
             .post('/files')
             .attach('file', upload_file_path)
             .set("Content-Type", "multipart/form-data")
             .then(function (response) {
-                request(app)
-                    .get(`/files/${response.body.publicKey}`)
-                    .expect(200)
-                    .then(async function (response ) {
-                        expect(Buffer.compare(fs.readFileSync(upload_file_path), response.body)).toBe(0);
-                        done();
-                    })
+                return response.body;
             });
+        const uploaded_file = await request(app)
+            .get(`/files/${publicKey}`)
+            .expect(200)
+            .then(function (response ) {
+                return response.body;
+            });
+
+        expect(Buffer.compare(fs.readFileSync(upload_file_path), uploaded_file)).toBe(0);
     });
 })

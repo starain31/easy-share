@@ -43,7 +43,6 @@ router.get('/files/:publicKey?', async function (req, res) {
 
     res.writeHead(200, { "Content-type": file.mimetype });
     res.end(content);
-
   } catch (e) {
     console.error(e);
     res.status(404).send({message: "No such file or invalid key"});
