@@ -1,4 +1,4 @@
-const create = require("./local_file_system_storage");
+const local = require("./local_file_system_storage");
 
 const PROVIDER = {
     GOOGLE: 'google',
@@ -8,7 +8,7 @@ const PROVIDER = {
 function storage_provider({provider, db}) {
     switch (provider) {
         case PROVIDER.LOCAL:
-            return create({db});
+            return local({db});
     }
 }
 

@@ -1,10 +1,7 @@
 const express = require('express');
 const multer = require('multer')
-const fs = require("fs");
-const db = require("../db");
 
 function create_router({provider}) {
-
     const router = express.Router();
     const upload = multer({storage: multer.memoryStorage()}).single('file');
 
@@ -37,16 +34,14 @@ function create_router({provider}) {
     });
 
     router.delete('/files/:privateKey', async function (req, res) {
-        const file_details = await db.get_value_by_key({key: req.params.privateKey});
-
-        if (!file_details || !file_details.path || !fs.existsSync(file_details.path)) {
-            return res.status(400).send({message: "no such file or internal server error."});
-        }
-
-        fs.unlinkSync(file_details.path);
-        await db.delete_by_key({key: req.params.privateKey});
-
-        res.status(200).send({message: "file has been deleted."});
+        provider.del({privateKey: req.params.privateKey})
+            .then(function () {
+                res.status(200).send({message: "file has been deleted."});
+            })
+            .catch(function (e) {
+                console.error(e);
+                return res.status(400).send({message: "no such file or internal server error."});
+            })
     });
 
     return router;

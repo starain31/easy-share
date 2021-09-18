@@ -38,9 +38,21 @@ function create({db}) {
         return {content, file_details}
     }
 
+    async function del({privateKey}) {
+        const file_details = await db.get_value_by_key({key: privateKey});
+
+        if (!file_details || !file_details.path || !fs.existsSync(file_details.path)) {
+            throw 'No such file';
+        }
+
+        fs.unlinkSync(file_details.path);
+        await db.delete_by_key({key: privateKey});
+    }
+
     return {
         post,
-        get
+        get,
+        del
     };
 }
 
