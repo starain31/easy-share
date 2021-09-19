@@ -6,23 +6,15 @@ const fs = require("fs");
 
 let app;
 let db;
-jest.setTimeout(1000);
 
-beforeAll( (done) => {
-    create_db()
-        .then((_db) => {
-            db = _db;
-            app = create_app({db});
-            done();
-        });
+beforeAll( async () => {
+    db = await create_db();
+    app = await create_app({db});
 });
 
-afterAll(function (done) {
-    db.disconnect()
-        .then(function () {
-            done();
-        })
-});
+afterAll(async () => {
+    db.disconnect();
+})
 
 describe('API', () => {
     it('should be defined', function () {
