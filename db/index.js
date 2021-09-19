@@ -1,7 +1,7 @@
 const redis = require('redis');
 
 async function create() {
-    const redis_client = redis.createClient();
+    const redis_client = redis.createClient({});
     await redis_client.connect();
 
     async function save_keys({publicKey, privateKey, value}) {
@@ -19,10 +19,16 @@ async function create() {
         await redis_client.del(publicKey, privateKey);
     }
 
+
+    async function disconnect() {
+        return redis_client.quit();
+    }
+
     return {
         save_keys,
         get_value_by_key,
-        delete_by_key
+        delete_by_key,
+        disconnect
     }
 }
 

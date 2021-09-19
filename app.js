@@ -3,22 +3,23 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
-const create_db = require('./db');
 const create_router = require('./routes/index');
 const create_provider = require('./storage_provider');
 
-const app = express();
+function create_app({db}) {
+    const app = express();
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({extended: false}));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+    app.use(logger('dev'));
+    app.use(express.json());
+    app.use(express.urlencoded({extended: false}));
+    app.use(cookieParser());
+    app.use(express.static(path.join(__dirname, 'public')));
 
-create_db()
-    .then(function (db) {
-        const provider = create_provider({provider: process.env.PROVIDER, db});
-        app.use('/', create_router({provider}));
-    });
+    const provider = create_provider({provider: process.env.PROVIDER, db});
+    app.use('/', create_router({provider}));
 
-module.exports = app;
+    return app;
+}
+
+
+module.exports = create_app;

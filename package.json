@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "jest",
+    "test": "jest --watchAll --verbose false --detectOpenHandles --forceExit",
     "dev": "nodemon ./bin/www"
   },
   "dependencies": {

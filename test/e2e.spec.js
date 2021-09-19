@@ -1,16 +1,27 @@
 const request = require("supertest");
-const app = require("../app");
+const create_app = require("../app");
+const create_db = require("../db");
 const fs = require("fs");
 
-describe("Test the root path", () => {
-    test("It should response the root path", done => {
-        request(app)
-            .get("/")
-            .then(response => {
-                expect(response.statusCode).toBe(200);
-                done();
-            });
-    });
+
+let app;
+let db;
+jest.setTimeout(1000);
+
+beforeAll( (done) => {
+    create_db()
+        .then((_db) => {
+            db = _db;
+            app = create_app({db});
+            done();
+        });
+});
+
+afterAll(function (done) {
+    db.disconnect()
+        .then(function () {
+            done();
+        })
 });
 
 describe('API', () => {
@@ -81,4 +92,4 @@ describe('API', () => {
             .expect(404);
 
     });
-})
+});
