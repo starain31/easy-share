@@ -8,18 +8,35 @@ const fs = require("fs");
 const create_app = require('../app');
 const create_db = require('../db');
 
+const DEFAULTS = {
+  PORT: 3000,
+  FOLDER: './uploads',
+  PROVIDER: 'local',
+  TIME_WINDOW: '20',
+  UPLOAD_LIMIT: '5',
+  DOWNLOAD_LIMIT: '10',
+};
+
 (async function () {
 
-  const upload_folder_path = process.env.FOLDER || './uploads'
+  const upload_folder_path = process.env.FOLDER || DEFAULTS.FOLDER;
 
   if (!fs.existsSync(upload_folder_path)){
     fs.mkdirSync(upload_folder_path);
   }
 
-  const port = normalizePort(process.env.PORT || '3000');
+  const port = normalizePort(process.env.PORT || DEFAULTS.PORT);
 
   const db = await create_db();
-  const server = http.createServer(create_app({db}));
+
+  const server = http.createServer(create_app({
+    db,
+    time_window: process.env.TIME_WINDOW || DEFAULTS.TIME_WINDOW,
+    UPLOAD_LIMIT: process.env.UPLOAD_LIMIT || DEFAULTS.UPLOAD_LIMIT,
+    DOWNLOAD_LIMIT: process.env.DOWNLOAD_LIMIT || DEFAULTS.DOWNLOAD_LIMIT,
+    provider_name: process.env.PROVIDER || DEFAULTS.PROVIDER,
+    upload_folder: process.env.FOLDER || DEFAULTS.FOLDER
+  }));
 
   server.listen(port);
   server.on('error', onError);

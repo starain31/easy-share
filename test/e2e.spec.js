@@ -6,15 +6,29 @@ const fs = require("fs");
 
 let app;
 let db;
+const daily_usages = {
+    time_window: Number(process.env.TIME_WINDOW),
+    UPLOAD_LIMIT: Number(process.env.UPLOAD_LIMIT),
+    DOWNLOAD_LIMIT: Number(process.env.DOWNLOAD_LIMIT)
+}
 
 beforeAll( async () => {
     db = await create_db();
-    app = await create_app({db});
+    app = await create_app({
+        db,
+        ...daily_usages,
+        provider_name: process.env.PROVIDER,
+        upload_folder: process.env.FOLDER
+    });
 });
 
 afterAll(async () => {
     db.disconnect();
-})
+});
+
+afterEach(async () => {
+   await db.clear_all();
+});
 
 describe('API', () => {
     it('should be defined', function () {
@@ -83,5 +97,31 @@ describe('API', () => {
             .get(`/files/${publicKey}`)
             .expect(404);
 
+    });
+
+    //For test purpose we are limiting download 5 per 3 second defined in test environment variable.
+    it('should limit download', async function () {
+        try {
+            const upload_file_path = './test/uploads/test.txt';
+
+            const {publicKey} = await request(app)
+                .post('/files')
+                .attach('file', upload_file_path)
+                .set("Content-Type", "multipart/form-data")
+                .then(function (response) {
+                    return response.body;
+                });
+
+            await Promise.all([
+                ...Array.from({length: daily_usages.DOWNLOAD_LIMIT},
+                    () => request(app).get(`/files/${publicKey}`)
+                ),
+            ]);
+
+            return request(app).get(`/files/${publicKey}`).expect(429);
+
+        } catch (e) {
+            console.error(e);
+        }
     });
 });

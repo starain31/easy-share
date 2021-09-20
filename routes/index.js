@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer')
 
-function create_router({provider}) {
+function create_router({provider, upload_limiter, download_limiter}) {
     const router = express.Router();
     const upload = multer({storage: multer.memoryStorage()}).single('file');
 
@@ -9,7 +9,7 @@ function create_router({provider}) {
         res.render('index', {title: 'Express'});
     });
 
-    router.post('/files', upload, async function (req, res) {
+    router.post('/files', upload_limiter, upload, async function (req, res) {
         provider.post({file: req.file})
             .then(function ({privateKey, publicKey}) {
                 res.status(200).send({publicKey, privateKey});
@@ -20,7 +20,7 @@ function create_router({provider}) {
             })
     });
 
-    router.get('/files/:publicKey?', async function (req, res) {
+    router.get('/files/:publicKey?', download_limiter, async function (req, res) {
         provider.get({publicKey: req.params.publicKey})
             .then(function ({content, file_details}) {
                 res.writeHead(200, {"Content-type": file_details.mimetype});

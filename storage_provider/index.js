@@ -5,10 +5,10 @@ const PROVIDER = {
     LOCAL: 'local'
 }
 
-function storage_provider({provider, db}) {
-    switch (provider) {
+function storage_provider({provider_name, db, upload_folder}) {
+    switch (provider_name) {
         case PROVIDER.LOCAL:
-            return local({db});
+            return local({db, upload_folder});
     }
 }
 

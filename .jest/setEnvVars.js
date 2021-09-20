@@ -1,2 +1,5 @@
-process.env.FOLDER = './test/uploads'
-process.env.PROVIDER = 'local'
+process.env.FOLDER='./test/uploads'
+process.env.PROVIDER='local'
+process.env.TIME_WINDOW='3'
+process.env.UPLOAD_LIMIT='5'
+process.env.DOWNLOAD_LIMIT='10'
