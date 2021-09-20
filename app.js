@@ -4,10 +4,9 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
 const create_router = require('./routes/index');
-const create_provider = require('./storage_provider');
 const create_usages_limiter = require('./usage-limiter');
 
-function create_app({db, time_window, provider_name, upload_folder, UPLOAD_LIMIT, DOWNLOAD_LIMIT}) {
+function create_app({db, time_window, provider, UPLOAD_LIMIT, DOWNLOAD_LIMIT}) {
     const app = express();
 
     app.use(logger('dev'));
@@ -19,13 +18,13 @@ function create_app({db, time_window, provider_name, upload_folder, UPLOAD_LIMIT
     const upload_limiter = create_usages_limiter({
         time_window, request_limit: UPLOAD_LIMIT, db, name: 'upload'
     });
+
     const download_limiter = create_usages_limiter({
         time_window, request_limit: DOWNLOAD_LIMIT, db, name: 'download'
     });
 
-    const provider = create_provider({provider_name, db, upload_folder});
-
     app.use('/', create_router({provider, upload_limiter, download_limiter}));
+
 
     return app;
 }

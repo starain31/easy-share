@@ -2,12 +2,12 @@ const {randomUUID} = require("crypto");
 const path = require("path");
 const fs = require("fs");
 
-function create({db, upload_folder}) {
+function create({db, FOLDER}) {
     async function post({file}) {
         const publicKey = `public-${randomUUID()}`;
         const privateKey = `private-${randomUUID()}`;
 
-        const file_path = path.join(upload_folder, `${publicKey}_${file.originalname}`);
+        const file_path = path.join(FOLDER, `${publicKey}_${file.originalname}`);
 
         await db.save_keys({
             publicKey,

@@ -13,6 +13,7 @@ async function create() {
     await redis_client.connect();
 
     async function save_keys({publicKey, privateKey, value}) {
+        value = {...value, last_active_time: new Date().getTime()}
         await redis_client.set(publicKey, JSON.stringify(value));
         await redis_client.set(privateKey, JSON.stringify(value));
     }
@@ -43,13 +44,19 @@ async function create() {
         return redis_client.flushAll();
     }
 
+    async function get_by_pattern({pattern}) {
+        return redis_client.keys(pattern)
+
+    }
+
     return {
         save_keys,
         get_value_by_key,
         delete_by_key,
         disconnect,
         increment_daily_request,
-        clear_all
+        clear_all,
+        get_by_pattern
     }
 }
 

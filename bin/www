@@ -5,59 +5,75 @@
  */
 const http = require('http');
 const fs = require("fs");
+const cron = require("node-cron");
+
 const create_app = require('../app');
 const create_db = require('../db');
+const create_provider = require("../storage_provider");
+const create_inactive_storage_cleanup = require("../inactive_storage_cleanup");
 
 const DEFAULTS = {
-  PORT: 3000,
-  FOLDER: './uploads',
-  PROVIDER: 'local',
-  TIME_WINDOW: '20',
-  UPLOAD_LIMIT: '5',
-  DOWNLOAD_LIMIT: '10',
+    PORT: 3000,
+    FOLDER: './uploads',
+    PROVIDER: 'local',
+    TIME_WINDOW: '20',
+    UPLOAD_LIMIT: '5',
+    DOWNLOAD_LIMIT: '10',
 };
 
 (async function () {
 
-  const upload_folder_path = process.env.FOLDER || DEFAULTS.FOLDER;
+    const upload_folder_path = process.env.FOLDER || DEFAULTS.FOLDER;
 
-  if (!fs.existsSync(upload_folder_path)){
-    fs.mkdirSync(upload_folder_path);
-  }
+    if (!fs.existsSync(upload_folder_path)) {
+        fs.mkdirSync(upload_folder_path);
+    }
 
-  const port = normalizePort(process.env.PORT || DEFAULTS.PORT);
+    const PORT = normalizePort(process.env.PORT || DEFAULTS.PORT);
 
-  const db = await create_db();
+    const PROVIDER = process.env.PROVIDER || DEFAULTS.PROVIDER;
+    const FOLDER = process.env.FOLDER || DEFAULTS.FOLDER;
+    const FILE_INACTIVE_LIMIT = process.env.FILE_INACTIVE_LIMIT || 2 * 60 * 1000;
 
-  const server = http.createServer(create_app({
-    db,
-    time_window: process.env.TIME_WINDOW || DEFAULTS.TIME_WINDOW,
-    UPLOAD_LIMIT: process.env.UPLOAD_LIMIT || DEFAULTS.UPLOAD_LIMIT,
-    DOWNLOAD_LIMIT: process.env.DOWNLOAD_LIMIT || DEFAULTS.DOWNLOAD_LIMIT,
-    provider_name: process.env.PROVIDER || DEFAULTS.PROVIDER,
-    upload_folder: process.env.FOLDER || DEFAULTS.FOLDER
-  }));
+    const db = await create_db();
+    const provider = create_provider({PROVIDER, db, FOLDER});
 
-  server.listen(port);
-  server.on('error', onError);
-  server.on('listening', onListening);
+    const server = http.createServer(create_app({
+        db,
+        provider,
+        time_window: process.env.TIME_WINDOW || DEFAULTS.TIME_WINDOW,
+        UPLOAD_LIMIT: process.env.UPLOAD_LIMIT || DEFAULTS.UPLOAD_LIMIT,
+        DOWNLOAD_LIMIT: process.env.DOWNLOAD_LIMIT || DEFAULTS.DOWNLOAD_LIMIT,
+    }));
+
+    server.listen(PORT);
+    server.on('error', onError);
+    server.on('listening', onListening);
+
+    const storage_cleanup = create_inactive_storage_cleanup({
+        db, provider, FILE_INACTIVE_LIMIT
+    });
+
+    cron.schedule('* * * * *', () => {
+        storage_cleanup.cleanup();
+    });
+
 })();
 
-
 function normalizePort(val) {
-  const port = parseInt(val, 10);
+    const port = parseInt(val, 10);
 
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
 
-  if (port >= 0) {
-    // port number
-    return port;
-  }
+    if (port >= 0) {
+        // port number
+        return port;
+    }
 
-  return false;
+    return false;
 }
 
 /**
@@ -65,27 +81,27 @@ function normalizePort(val) {
  */
 
 function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
 
-  const bind = typeof port === 'string'
-      ? 'Pipe ' + port
-      : 'Port ' + port;
+    const bind = typeof port === 'string'
+        ? 'Pipe ' + port
+        : 'Port ' + port;
 
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
 }
 
 /**
@@ -93,5 +109,5 @@ function onError(error) {
  */
 
 function onListening() {
-  console.log('Server is listening...');
+    console.log('Server is listening...');
 }

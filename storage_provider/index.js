@@ -1,14 +1,14 @@
 const local = require("./local_file_system_storage");
 
-const PROVIDER = {
+const PROVIDERS = {
     GOOGLE: 'google',
     LOCAL: 'local'
 }
 
-function storage_provider({provider_name, db, upload_folder}) {
-    switch (provider_name) {
-        case PROVIDER.LOCAL:
-            return local({db, upload_folder});
+function storage_provider({PROVIDER, db, FOLDER}) {
+    switch (PROVIDER) {
+        case PROVIDERS.LOCAL:
+            return local({db, FOLDER});
     }
 }
 

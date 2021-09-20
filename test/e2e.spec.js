@@ -2,6 +2,7 @@ const request = require("supertest");
 const create_app = require("../app");
 const create_db = require("../db");
 const fs = require("fs");
+const create_provider = require("../storage_provider");
 
 
 let app;
@@ -12,13 +13,18 @@ const daily_usages = {
     DOWNLOAD_LIMIT: Number(process.env.DOWNLOAD_LIMIT)
 }
 
+const PROVIDER = process.env.PROVIDER;
+const FOLDER = process.env.FOLDER;
+
 beforeAll(async () => {
     db = await create_db();
+
+    const provider = create_provider({PROVIDER, db, FOLDER});
+
     app = await create_app({
-        db,
         ...daily_usages,
-        provider_name: process.env.PROVIDER,
-        upload_folder: process.env.FOLDER
+        db,
+        provider,
     });
 });
 
