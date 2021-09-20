@@ -12,7 +12,7 @@ const daily_usages = {
     DOWNLOAD_LIMIT: Number(process.env.DOWNLOAD_LIMIT)
 }
 
-beforeAll( async () => {
+beforeAll(async () => {
     db = await create_db();
     app = await create_app({
         db,
@@ -27,7 +27,7 @@ afterAll(async () => {
 });
 
 afterEach(async () => {
-   await db.clear_all();
+    await db.clear_all();
 });
 
 describe('API', () => {
@@ -99,7 +99,7 @@ describe('API', () => {
 
     });
 
-    //For test purpose we are limiting download 5 per 3 second defined in test environment variable.
+    //For test purpose we are limiting download 10 file per 3 second defined in test environment variable.
     it('should limit download', async function () {
         try {
             const upload_file_path = './test/uploads/test.txt';
@@ -123,5 +123,26 @@ describe('API', () => {
         } catch (e) {
             console.error(e);
         }
+    });
+
+    //For testing purpose we are limiting upload 5 file per 3 seconds.
+    //Defined in test environment variable.
+    it('should limit upload', async function () {
+        const upload_file_path = './test/uploads/test.txt';
+
+        await Promise.all(
+            Array.from({length: daily_usages.UPLOAD_LIMIT},
+                () => request(app)
+                    .post('/files')
+                    .attach('file', upload_file_path)
+                    .set("Content-Type", "multipart/form-data")
+            ));
+
+        return request(app)
+            .post('/files')
+            .attach('file', upload_file_path)
+            .set("Content-Type", "multipart/form-data")
+            .expect(429);
+
     });
 });
