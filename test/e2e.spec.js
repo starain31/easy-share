@@ -4,7 +4,6 @@ const create_db = require("../db");
 const fs = require("fs");
 const create_provider = require("../storage_provider");
 
-
 let app;
 let db;
 const daily_usages = {
