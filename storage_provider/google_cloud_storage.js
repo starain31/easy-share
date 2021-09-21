@@ -31,18 +31,15 @@ function create({db, CONFIG}) {
     }
 
     async function get({publicKey}) {
-        //TODO:
-        //Implement...
+        const file_details = await db.get_value_by_key({key: publicKey});
 
-        // const file_details = await db.get_value_by_key({key: publicKey});
-        //
-        // if (!file_details) {
-        //     throw "No such file";
-        // }
-        //
-        // const content = fs.readFileSync(file_details.path);
-        //
-        // return {content, file_details}
+        if (!file_details) {
+            throw "No such file";
+        }
+
+        const content = await storage.bucket(bucketName).file(file_details.path).download();
+
+        return {content: content[0], file_details}
     }
 
     async function del({privateKey}) {
