@@ -6,7 +6,7 @@ const fs = require("fs");
 function create({db, CONFIG}) {
     const {keyFilename, bucketName} = JSON.parse(fs.readFileSync(CONFIG).toString());
 
-    const storage = new Storage({keyFilename});
+    const bucket = new Storage({keyFilename}).bucket(bucketName);
 
     async function post({file}) {
         const publicKey = `public-${randomUUID()}`;
@@ -14,7 +14,7 @@ function create({db, CONFIG}) {
 
         const file_path = path.join(`${publicKey}_${file.originalname}`);
 
-        await storage.bucket(bucketName).file(file_path).save(file.buffer);
+        await bucket.file(file_path).save(file.buffer);
 
         await db.save_keys({
             publicKey,
@@ -37,23 +37,20 @@ function create({db, CONFIG}) {
             throw "No such file";
         }
 
-        const content = await storage.bucket(bucketName).file(file_details.path).download();
+        const content = await bucket.file(file_details.path).download();
 
         return {content: content[0], file_details}
     }
 
     async function del({privateKey}) {
-        //TODO:
-        //Implement...
+        const file_details = await db.get_value_by_key({key: privateKey});
 
-        // const file_details = await db.get_value_by_key({key: privateKey});
-        //
-        // if (!file_details || !file_details.path || !fs.existsSync(file_details.path)) {
-        //     throw 'No such file';
-        // }
-        //
-        // fs.unlinkSync(file_details.path);
-        // await db.delete_by_key({key: privateKey});
+        if (!file_details || !file_details.path || !(await bucket.file(file_details.path).exists())) {
+            throw 'No such file';
+        }
+
+        await bucket.file(file_details.path).delete();
+        await db.delete_by_key({key: privateKey});
     }
 
     return {
