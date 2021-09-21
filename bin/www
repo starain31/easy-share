@@ -34,9 +34,10 @@ const DEFAULTS = {
     const PROVIDER = process.env.PROVIDER || DEFAULTS.PROVIDER;
     const FOLDER = process.env.FOLDER || DEFAULTS.FOLDER;
     const FILE_INACTIVE_LIMIT = process.env.FILE_INACTIVE_LIMIT || 2 * 60 * 1000;
+    const CONFIG = process.env.CONFIG;
 
     const db = await create_db();
-    const provider = create_provider({PROVIDER, db, FOLDER});
+    const provider = create_provider({PROVIDER, db, FOLDER, CONFIG});
 
     const server = http.createServer(create_app({
         db,
