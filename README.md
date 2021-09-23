@@ -3,8 +3,9 @@ A file sharing Rest API service
 
 
 ## Dependencies
-1. Redis:6.2.x
-2. Google Cloud Storage.
+1. Node.js: v14.17.3
+2. Redis:6.2.x
+3. Google Cloud Storage.
 
 ## Environment Variable
 1. `PORT`: for public access port.
