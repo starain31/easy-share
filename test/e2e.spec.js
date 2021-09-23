@@ -39,7 +39,7 @@ describe('API', () => {
     it('should be defined', function () {
         return request(app)
             .post('/files')
-            .attach('file', './test/uploads/test_file_1.txt')
+            .attach('file', './test/uploads/test_file_3.txt')
             .set("Content-Type", "multipart/form-data")
             .expect(200);
     });
@@ -47,7 +47,7 @@ describe('API', () => {
     it('It should accept “multipart/form-data”', function () {
         return request(app)
             .post('/files')
-            .attach('file', './test/uploads/test_file_1.txt')
+            .attach('file', './test/uploads/test_file_3.txt')
             .set("Content-Type", "multipart/form-data")
             .expect(200);
     });
@@ -55,7 +55,7 @@ describe('API', () => {
     it('should return a “publicKey” and a “privateKey”', function (done) {
         request(app)
             .post('/files')
-            .attach('file', './test/uploads/test_file_1.txt')
+            .attach('file', './test/uploads/test_file_3.txt')
             .set("Content-Type", "multipart/form-data")
             .then(function (response) {
                 expect(response.body.publicKey).toBeDefined();
@@ -65,7 +65,7 @@ describe('API', () => {
     });
 
     it('should upload the file', async function () {
-        const upload_file_path = './test/uploads/code-test.pdf';
+        const upload_file_path = './test/uploads/test_file_1.pdf';
         const {publicKey} = await request(app)
             .post('/files')
             .attach('file', upload_file_path)
@@ -84,7 +84,7 @@ describe('API', () => {
     });
 
     it('should delete file', async function () {
-        const upload_file_path = './test/uploads/code-test.pdf';
+        const upload_file_path = './test/uploads/test_file_1.pdf';
         const {privateKey, publicKey} = await request(app)
             .post('/files')
             .attach('file', upload_file_path)
@@ -107,7 +107,7 @@ describe('API', () => {
     //For test purpose we are limiting download 10 file per 3 second defined in test environment variable.
     it('should limit download', async function () {
         try {
-            const upload_file_path = './test/uploads/test.txt';
+            const upload_file_path = './test/uploads/test_file_4.txt';
 
             const {publicKey} = await request(app)
                 .post('/files')
@@ -133,7 +133,7 @@ describe('API', () => {
     //For testing purpose we are limiting upload 5 file per 3 seconds.
     //Defined in test environment variable.
     it('should limit upload', async function () {
-        const upload_file_path = './test/uploads/test.txt';
+        const upload_file_path = './test/uploads/test_file_4.txt';
 
         await Promise.all(
             Array.from({length: daily_usages.UPLOAD_LIMIT},
