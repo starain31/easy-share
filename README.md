@@ -13,8 +13,8 @@ A file sharing Rest API service
 3. `FOLDER`: where to save files if `PROVIDER` is 'local'
 4. `TIME_WINDOW`: time window for API request limit,
 5. `UPLOAD_LIMIT`: upload limit for the `TIME_WINDOW`, 
-6. `DOWNLOAD_LIMIT`: download limit for `TIME_WINDOW`,
-7. `CONFIG`: config file path for Google cloud.
+6. `DOWNLOAD_LIMIT`: download limit for the `TIME_WINDOW`,
+7. `CONFIG`: config file path for Google cloud configuration.
 8. CONFIG file format: A JSON file with the following format.
     ```json
         {
